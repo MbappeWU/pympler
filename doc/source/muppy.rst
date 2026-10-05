@@ -52,6 +52,16 @@ inspect.BlockFinder
 sre_parse.Pattern
 . . .
 
+The returned list keeps strong references to the objects it contains. When
+taking repeated snapshots, release the previous raw result before collecting
+the next one. Assigning a new result to the same variable evaluates the right
+hand side while the previous list is still live, and the new list can include
+that previous result. Filtered lists keep references too.
+
+When the raw result is no longer needed, ``del all_objects`` removes the
+variable binding. The list's references are released only when no other live
+alias or reference keeps the list. Objects referenced elsewhere remain live.
+
 This result, for example, tells us that the number of lists remained the same,
 but the memory allocated by lists has increased by 8 bytes. The correct increase
 for a LP64 system (see 64-Bit_Programming_Models_). 
@@ -81,6 +91,8 @@ You can create summaries
                          set |          48 |     10.88 KB
          function (__init__) |          81 |      9.49 KB
            member_descriptor |         131 |      9.21 KB
+
+>>> del all_objects
 
 and compare them with other summaries.
 
